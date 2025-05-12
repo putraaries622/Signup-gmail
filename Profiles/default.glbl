@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalVariableEntities>
+   <description></description>
+   <name>default</name>
+   <tag></tag>
+   <defaultProfile>true</defaultProfile>
+   <GlobalVariableEntity>
+      <description></description>
+      <initValue>'https://accounts.google.com/v3/signin/identifier?authuser=0&amp;continue=https%3A%2F%2Fmyaccount.google.com%2F%3Futm_source%3Dsign_in_no_continue%26pli%3D1&amp;ec=GAlAwAE&amp;hl=en&amp;service=accountsettings&amp;flowName=GlifWebSignIn&amp;flowEntry=AddSession&amp;dsh=S1998681656%3A1746977263125206'</initValue>
+      <name>url</name>
+   </GlobalVariableEntity>
+</GlobalVariableEntities>
