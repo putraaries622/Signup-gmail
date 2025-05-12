@@ -17,33 +17,50 @@ import com.kms.katalon.core.testobject.TestObject
 import com.kms.katalon.core.webservice.keyword.WSBuiltInKeywords as WS
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 import internal.GlobalVariable
 
 public class GetOTP {
 	@Keyword
-	def String fetchOTPFromSMS() {
-		String otpCode = ""
-		try {
-			// Jalankan perintah ADB untuk mengambil SMS dari inbox
-			Process process = Runtime.getRuntime().exec("adb shell content query --uri content://sms/inbox")
-			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))
-			String line
+	def static String fetchOTPFromSender(String senderName) {
+		def process = ["adb", "shell", "content", "query", "--uri", "content://sms/inbox"].execute()
+		def output = process.text
+		def lines = output.readLines()
 
-			while ((line = reader.readLine()) != null) {
-				// Cari baris yang mengandung OTP (biasanya angka 4-6 digit)
-				def matcher = (line =~ /\b\d{4,6}\b/)
-				if (matcher.find()) {
-					otpCode = matcher.group()
-					break
+		String latestOTP = null
+		long latestDate = 0L
+
+		lines.each { line ->
+			// Hanya ambil baris yang mengandung sender yang sesuai
+			if (line.contains("address=${senderName}")) {
+				def dateMatch = (line =~ /date=(\d+)/)
+				def bodyMatch = (line =~ /body=(.+?)(?= \w+=|$)/)
+
+				if (dateMatch && bodyMatch) {
+					long smsDate = dateMatch[0][1].toLong()
+					String bodyText = bodyMatch[0][1]
+
+					// Ambil OTP (dengan atau tanpa G- prefix)
+					def otpMatch = (bodyText =~ /\b(?:G-)?(\d{4,8})\b/)
+
+					if (otpMatch) {
+						if (smsDate > latestDate) {
+							latestDate = smsDate
+							latestOTP = otpMatch[0][0]
+						}
+					}
 				}
 			}
-			reader.close()
-		} catch (Exception e) {
-			println("Gagal ambil OTP: " + e.getMessage())
 		}
 
-		println("OTP: " + otpCode)
-		return otpCode
+		if (latestOTP != null) {
+			println "OTP dari ${senderName}: ${latestOTP}"
+			return latestOTP
+		} else {
+			println "Tidak ditemukan OTP dari ${senderName}"
+			return ""
+		}
 	}
 }

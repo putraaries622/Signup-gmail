@@ -47,7 +47,12 @@ WebUI.click(findTestObject('Object Repository/select-gender', [('gender') : gend
 
 WebUI.click(findTestObject('btn-next'))
 
-WebUI.click(findTestObject('checkbox-your-own-gmail-address'))
+TestObject myOwn = findTestObject('checkbox-your-own-gmail-address')
+
+if (WebUI.verifyElementPresent(myOwn, 10, FailureHandling.OPTIONAL)) {
+    WebUI.comment("Elemen ditemukan, lanjut ke langkah berikutnya")
+    WebUI.click(myOwn)
+}
 
 // Misal username awal
 String baseUsername = username
